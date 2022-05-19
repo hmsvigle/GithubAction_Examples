@@ -2,7 +2,8 @@
 
 Sample examples of Github Action
 
-The yaml structure is ideally in below format.
+* Multiple jobs can run on diff runners `parallelly`
+* The yaml structure is ideally in below format.
 
 ````yaml
 
@@ -15,9 +16,26 @@ Workflow:
       * Step-1:
       * Step-2:
 ````
+* We can sepcify dependcy of 2nd job on 1st job
+
+```yaml
+ 
+ Workflow:
+  * on Event:
+    * Job-1:
+      * Step-1:
+    * Job-2:
+        runs-on: [ubuntu-latest]
+        # For Sequencial execution
+        needs: ["Job-1"]
+      * Step-1:
+ ```
+
+## Examples:
 
 * [Multiline-Shell-Commands](.github/workflows/multiline-shell-command.yaml)
   * Single & multiple lined shell commands executed on ubuntu runner
+  * 
 
 
 
