@@ -22,5 +22,5 @@ jobs:
         timeout-minutes: 0
       - name: multiline script 
         run: |
-           "Hello Multiline String"
-           "This is second line"
+           echo "Hello Multiline String"
+           echo "This is second line"
