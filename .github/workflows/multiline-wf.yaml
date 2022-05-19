@@ -1,0 +1,26 @@
+# Workflow name
+name: Shell Commands
+
+# Events triggered for pull/push/issues etc
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+    - feature/workflow-01
+    - main
+  
+
+# One event can have multiple JOBs with steps for each job.
+jobs:
+  # job name
+  run-shell-command:
+    # where it will be executed
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo a string
+        run: echo "Hello World"
+        timeout-minutes: 0
+      - name: multiline script 
+        run: |
+           "Hello Multiline String"
+           "This is second line"
