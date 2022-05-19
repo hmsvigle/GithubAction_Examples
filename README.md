@@ -37,6 +37,9 @@ Workflow:
      * id: we can define a id for this step. so that output can be referenced in a different step.
      * Also many other inputs, that can be reviewed from the respective action github repo.
 
+### Workflow:
+ * in the section `on.pus.paths`,  If you define a path with the ! character, you must also define at least one path without the ! character. If you only want to exclude paths, use paths-ignore instead. Else with only exclude paths, `paths-ignore` can be used.
+ 
  
 ### Examples:
 
