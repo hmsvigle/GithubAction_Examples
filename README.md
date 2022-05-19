@@ -1,6 +1,6 @@
 # Github Action Examples
 
-Sample examples of Github Action
+## Overview:
 
 * Multiple jobs can run on diff runners `parallelly`
 * The yaml structure is ideally in below format.
@@ -30,8 +30,9 @@ Workflow:
         needs: ["Job-1"]
       * Step-1:
  ```
+ * **`Steps`** can execute `Commands`/`Actions`
 
-## Examples:
+### Examples:
 
 * [Multiline-Shell-Commands](.github/workflows/multiline-shell-command.yaml)
   * Single & multiple lined shell commands executed on ubuntu runner
