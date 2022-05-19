@@ -39,7 +39,8 @@ Workflow:
 
 ### Workflow:
  * in the section `on.pus.paths`,  If you define a path with the ! character, you must also define at least one path without the ! character. If you only want to exclude paths, use paths-ignore instead. Else with only exclude paths, `paths-ignore` can be used.
- * [Default Env Variables](https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables) can be used in the workflow
+ * [Default Env Variables](https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables) can be used in the workflow.
+   * GITHUB_SHA | GITHUB_WORKSPACE | etc
  
 ### Examples:
 
