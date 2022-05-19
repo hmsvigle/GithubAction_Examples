@@ -35,7 +35,9 @@ Workflow:
      * uses: <org>/<repo_name>@<release> i.e `actions/hello-world-javascript-action@v1` from the [link](https://github.com/actions/hello-world-javascript-action)
      * with: Takes inputs
      * id: we can define a id for this step. so that output can be referenced in a different step.
+     * Also many other inputs, that can be reviewed from the respective action github repo.
 
+ 
 ### Examples:
 
 * [Multiline-Shell-Commands](.github/workflows/multiline-shell-command.yaml)
@@ -44,7 +46,7 @@ Workflow:
 
 
 
-Reference: 
+### Reference: 
 * [Link-1](https://github.com/alialaa/github-actions-course/blob/master/.github/workflows/simple.yml)
 * [Link-2]()
 * [Actions-List](https://github.com/actions)
