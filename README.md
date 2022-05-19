@@ -16,7 +16,7 @@ Workflow:
       * Step-1:
       * Step-2:
 ````
-* We can sepcify dependcy of 2nd job on 1st job
+* We can sepcify `needs` snippet for sequential execution of jobs.
 
 ```yaml
  
