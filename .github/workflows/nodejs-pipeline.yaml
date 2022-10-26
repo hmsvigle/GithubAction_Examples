@@ -1,0 +1,74 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: DEV Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - FeatureSprintBranch
+    
+jobs:
+  NPM-Build:
+    runs-on: [ self-hosted, label ]
+    steps:
+      - uses: AutoModality/action-clean@v1
+      - name: checkut-Build 🛎️ ⏲️
+        uses: actions/checkout@v2         
+      - name: Checkout tools repo
+        uses: actions/checkout@v2
+        with:
+          repository: <Org>/<depenent_repo>
+          path: ./src/<depenent_repo>
+          token: ${{ secrets.PAT_TOKEN }}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.x' 
+          registry-url: 'https://registry.npmjs.org'
+      - name: Set working directory
+        run: cd ../../
+        working-directory: ${{env.working-directory}}
+      - name: Use .npmrc
+        uses: bduff9/use-npmrc@v1.1
+        with: 
+          dot-npmrc: ${{ secrets.DOT_NPMRC }}
+      - name: Remove package-lock.json
+        description: package-lock.json file gets generated with npm installation.
+        run: rm -f package-lock.json
+      - run: CI=false npm install --force --verbose
+      - run: npm install react-table --force
+        name: install npm
+      - run: CI=false npm run build --prod
+      
+  Docker-Build:
+    runs-on: [ self-hosted, label ]      
+    needs:  [NPM-Build]
+    steps: 
+    - name: docker Build & push 📦
+      run: |
+        cp ~/.npmrc .
+        docker login -u=${{ secrets.USER }} -p=${{ secrets.HARBOR_PWD}} registry.app.corpintra.net    
+        docker build -f Dev-Dockerfile .  --tag <registry_url>/<user>/<repo>:dev-v${{ github.sha }} 
+        docker push <registry_url>/<user>/<repo>:dev-v${{ github.sha }} 
+  
+  Kubernetes-Dev-Deployment: 
+    needs: Docker-Build
+    runs-on: [ label ]
+    environment:
+            name: Dev
+    steps:  
+    - uses: azure/k8s-set-context@v1
+      with:
+       method: kubeconfig
+       kubeconfig: ${{ secrets.KUBECONFIG }}
+   
+    - name: K8-Deplolyment  🚀
+      uses: Azure/k8s-deploy@v1.1
+      with:
+       namespace: 'dev'
+       manifests: |
+         k8s/dev/deployment.yaml
+       images: |
+         <registry_url>/<user>/<repo>:dev-v${{ github.sha }} 
+    - run: kubectl get pods -n dev
