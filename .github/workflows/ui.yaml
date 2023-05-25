@@ -1,0 +1,93 @@
+
+name: DEV Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - DEV
+
+jobs:
+  NPM-Build:
+    runs-on: [self-hosted, proj-runner-new]
+    steps:
+      - uses: AutoModality/action-clean@v1
+      - name: checkut-Build 🛎️ ⏲️
+        uses: actions/checkout@v2
+      #   with:
+      #     submodules: true
+      #     token: ${{ secrets.PAT_TOKEN }}
+
+      #  - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: '16.14.0'
+
+      - name: Checkout tools repo
+        uses: actions/checkout@v2
+        with:
+          repository: Proj/ComponentLibrary
+          path: ./src/ComponentLibrary
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16.x"
+          registry-url: "https://registry.npmjs.org"
+      - run: cd ../../
+        working-directory: ${{env.working-directory}}
+      - name: Use .npmrc
+        uses: bduff9/use-npmrc@v1.1
+        with:
+          dot-npmrc: ${{ secrets.DOT_NPMRC }}
+      #  - run: rm -f $HOME/.npmrc
+      #    - run: npm adduser
+      #      cat ~/.npmrc
+      #   - run: echo ~/.npmrc
+      - run: rm -f package-lock.json
+      - run: CI=false npm install --force --verbose
+      # - run: npm install react-table --force
+      # - run: CI=false npm install --verbose --force
+      #   working-directory: ./src/ComponentLibrary
+      - run: CI=false npm run build --prod
+
+  Docker-Build:
+    runs-on: [self-hosted, proj-runner-new]
+    needs: [NPM-Build]
+    steps:
+      - name: docker Build & push 📦
+        run: |
+          cp ~/.npmrc .
+          docker login -u='robot$proj+test_proj' -p=${{ secrets.HARBOR_PWD}} registry.app.corpintra.net    
+          docker build -f Dev-Dockerfile .  --tag registry.app.corpintra.net/proj/ui-dev:v${{ github.sha }} 
+          docker push registry.app.corpintra.net/proj/ui-dev:v${{ github.sha }}
+          
+  Helm-Setup:
+    needs: [ Docker-Build ]
+    runs-on: [ self-hosted, proj-runner-new ]
+    steps:
+     - name: Checkout Repository
+       uses: actions/checkout@v2
+     - name: Helm Installation
+       uses: azure/setup-helm@v3
+       with:
+          version: v3.10.2
+        
+  Kubernetes-Dev-Deployment:
+    needs: [ Helm-Setup ]
+    runs-on: [ self-hosted, proj-runner-new ]
+    environment:
+       name: dev
+    steps:
+    - name: Check all the running pods in Dev namespace
+      uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBE_CONFIG_C53_INT }}
+    - run: kubectl get pods -n proj-dev
+
+     # Helm upgrade command to change the image dynamically
+    - name: Helm upgrade
+      run: |
+         helm upgrade ui ./helm --install --set image.tag=v${{ github.sha }} -f ./values/ui-dev-values.yaml -n proj-dev
+         helm list -n proj-dev
+         kubectl get pods -n proj-dev
