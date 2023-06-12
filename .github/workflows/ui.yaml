@@ -57,9 +57,9 @@ jobs:
       - name: docker Build & push 📦
         run: |
           cp ~/.npmrc .
-          docker login -u='robot$proj+test_proj' -p=${{ secrets.HARBOR_PWD}} registry.app.corpintra.net    
-          docker build -f Dev-Dockerfile .  --tag registry.app.corpintra.net/proj/ui-dev:v${{ github.sha }} 
-          docker push registry.app.corpintra.net/proj/ui-dev:v${{ github.sha }}
+          docker login -u='robot$proj+test_proj' -p=${{ secrets.HARBOR_PWD}} dockerhub.com    
+          docker build -f Dev-Dockerfile .  --tag dockerhub.com/proj/ui-dev:v${{ github.sha }} 
+          docker push dockerhub.com/proj/ui-dev:v${{ github.sha }}
           
   Helm-Setup:
     needs: [ Docker-Build ]
