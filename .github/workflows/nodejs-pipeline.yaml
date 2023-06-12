@@ -48,7 +48,7 @@ jobs:
     - name: docker Build & push 📦
       run: |
         cp ~/.npmrc .
-        docker login -u=${{ secrets.USER }} -p=${{ secrets.HARBOR_PWD}} registry.app.corpintra.net    
+        docker login -u=${{ secrets.USER }} -p=${{ secrets.HARBOR_PWD}} dockerhub.com    
         docker build -f Dev-Dockerfile .  --tag <registry_url>/<user>/<repo>:dev-v${{ github.sha }} 
         docker push <registry_url>/<user>/<repo>:dev-v${{ github.sha }} 
   
